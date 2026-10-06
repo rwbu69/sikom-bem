@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Operasional Organisasi Kampus</title>
+    
+    <!-- Menggunakan Phosphor Icons untuk ikonografi yang jelas dan lugas -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        :root {
+            /* Palette: Classic Dashboard, High Contrast, No gradients */
+            --bg-body: #f0f2f5;
+            --bg-panel: #ffffff;
+            
+            --sidebar-bg: #2c3e50; /* Classic Slate/Navy - easy on the eyes for long sessions */
+            --sidebar-text: #bdc3c7;
+            --sidebar-active: #ffffff;
+            --sidebar-active-bg: #1a252f;
+            
+            --action-primary: #0056b3; /* Universal 'Action' Blue */
+            --action-primary-hover: #004494;
+            --action-success: #218838;
+            --action-danger: #c82333;
+            
+            --text-dark: #212529;
+            --text-muted: #6c757d;
+            
+            --border-color: #ced4da;
+            
+            /* Sangat minim radius, fokus pada fungsionalitas */
+            --radius-sm: 2px;
+            --radius-md: 4px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            /* Font sistem murni, menghindari font estetika web modern */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+            font-size: 14px;
+            line-height: 1.5;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .org-profile {
+            padding: 20px;
+            border-bottom: 1px solid #1a252f;
+            background-color: #243342;
+        }
+
+        .org-name {
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .org-role {
+            font-size: 12px;
+            color: #95a5a6;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 15px 0;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .nav-group-label {
+            padding: 10px 20px 5px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #7f8c8d;
+            font-weight: bold;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 20px;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: background-color 0.1s;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .nav-link.active {
+            background-color: var(--sidebar-active-bg);
+            color: var(--sidebar-active);
+            border-left-color: #3498db; /* Aksen penunjuk lokasi aktif */
+        }
+
+        .nav-link i {
+            font-size: 18px;
+        }
+
+        .main-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .top-bar {
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 24px;
+            height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        /* Jejak Navigasi (Breadcrumb) - Krusial untuk UX agar user tidak tersesat */
+        .breadcrumb {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        
+        .breadcrumb span {
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 13px;
+        }
+
+        .content-area {
+            padding: 24px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .page-header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: normal; /* Menghindari kesan 'teriak', lebih profesional */
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+
+        .page-desc {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .panel {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+        }
+
+        .panel-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            background-color: #f8f9fa; /* Header panel sedikit dibedakan */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-body {
+            padding: 20px;
+        }
+
+        /* Tombol yang tampak seperti tombol sungguhan (Bukan sekadar teks melayang) */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid transparent;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            text-decoration: none;
+            background-color: white; /* Default */
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background-color: var(--action-primary);
+            color: white;
+            border-color: var(--action-primary);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--action-primary-hover);
+            border-color: var(--action-primary-hover);
+        }
+
+        .btn-outline {
+            border-color: var(--border-color);
+            color: var(--text-dark);
+            background-color: #f8f9fa;
+        }
+
+        .btn-outline:hover {
+            background-color: #e2e6ea;
+            border-color: #dae0e5;
+        }
+
+        .btn-danger {
+            background-color: var(--action-danger);
+            color: white;
+            border-color: var(--action-danger);
+        }
+
+        /* Tabel Data Klasik - Sangat padat informasi dan mudah dipindai mata */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .data-table th, .data-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table th {
+            font-weight: 600;
+            color: var(--text-muted);
+            background-color: #f8f9fa;
+        }
+
+        .data-table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* Status kotak biasa, bukan pil menyala */
+        .status-box {
+            display: inline-block;
+            padding: 3px 8px;
+            font-size: 11px;
+            font-weight: bold;
+            border: 1px solid;
+            border-radius: 2px;
+        }
+
+        .status-draft { background: #f8f9fa; border-color: #ced4da; color: #495057; }
+        .status-jalan { background: #e8f4f8; border-color: #b8daff; color: #004085; }
+        .status-selesai { background: #d4edda; border-color: #c3e6cb; color: #155724; }
+
+        .grid-dashboard {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        .quick-action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .quick-action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--action-primary);
+            text-decoration: none;
+            gap: 8px;
+            font-weight: 500;
+        }
+        
+        .quick-action-btn:hover {
+            background: #f0f4f8;
+            border-color: #b8daff;
+        }
+
+        /* Form Layout: Membaca vertikal lebih alami */
+        .form-group {
+            margin-bottom: 15px;
+            max-width: 600px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--action-primary);
+            /* Focus tegak lurus, tidak blur/glow */
+            box-shadow: 0 0 0 1px var(--action-primary); 
+        }
+
+        /* Layout Hari-H Presensi (Dioptimalkan untuk Barcode Scanner / Kecepatan) */
+        .presensi-kiosk {
+            text-align: center;
+            max-width: 600px;
+            margin: 40px auto;
+        }
+        
+        .presensi-input {
+            font-size: 24px;
+            padding: 15px;
+            text-align: center;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        /* UX Logic: Mekanisme Pergantian Halaman */
+        .view-section {
+            display: none;
+        }
+        .view-section.active {
+            display: block;
+        }
+
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="org-profile">
+            <div class="org-name">BEM FILKOM 2026</div>
+            <div class="org-role"><i class="ph ph-user-circle"></i> Sekretaris / Admin</div>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-group-label">Operasional</li>
+            <li><a href="#" class="nav-link active" onclick="switchView('dashboard', this); return false;"><i class="ph ph-squares-four"></i> Ringkasan</a></li>
+            <li><a href="#" class="nav-link" onclick="switchView('kegiatan', this); return false;"><i class="ph ph-folder-open"></i> Proker & Kegiatan</a></li>
+            <li><a href="#" class="nav-link" onclick="switchView('pengumuman', this); return false;"><i class="ph ph-megaphone"></i> Pengumuman</a></li>
+            
+            <li class="nav-group-label">Pelaksanaan Acara</li>
+            <li><a href="#" class="nav-link" onclick="switchView('pendaftaran', this); return false;"><i class="ph ph-users"></i> Data Pendaftar</a></li>
+            <li><a href="#" class="nav-link" onclick="switchView('presensi', this); return false;"><i class="ph ph-scan"></i> Buka Presensi (Hari H)</a></li>
+            
+            <li class="nav-group-label">Arsip & Laporan</li>
+            <li><a href="#" class="nav-link"><i class="ph ph-camera"></i> Dokumentasi</a></li>
+            <li><a href="#" class="nav-link"><i class="ph ph-file-pdf"></i> Ekspor Laporan LPJ</a></li>
+        </ul>
+    </aside>
+
+    <main class="main-wrapper">
+        
+        <!-- Header Atas: Memberikan Konteks Lokasi (Breadcrumb) -->
+        <header class="top-bar">
+            <div class="breadcrumb" id="breadcrumb">
+                Beranda / <span>Ringkasan</span>
+            </div>
+            <div class="user-menu">
+                <span>Senin, 5 Okt 2026</span>
+                <button class="btn btn-outline" style="border: none;"><i class="ph ph-sign-out"></i> Keluar</button>
+            </div>
+        </header>
+
+        <div class="content-area">
+            
+            <!-- VIEW: DASHBOARD (Fokus pada apa yang harus dikerjakan) -->
+            <section id="view-dashboard" class="view-section active">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Selamat Pagi, Admin</h1>
+                        <p class="page-desc">Berikut adalah ringkasan status kegiatan yang butuh perhatian Anda.</p>
+                    </div>
+                </div>
+
+                <div class="grid-dashboard">
+                    <!-- Sisi Kiri: Data utama -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            Jadwal Kegiatan Terdekat
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nama Kegiatan</th>
+                                    <th>Tanggal</th>
+                                    <th>Status Pendaftaran</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Seminar Nasional Teknologi</strong></td>
+                                    <td>12 Okt 2026</td>
+                                    <td>Ditutup (250 pendaftar)</td>
+                                    <td><button class="btn btn-outline" onclick="switchView('presensi', document.querySelectorAll('.nav-link')[5])">Siapkan Presensi</button></td>
+                                </tr>
+                                <tr>
+                                    <td>Latihan Dasar Kepemimpinan (LDK)</td>
+                                    <td>20 Okt 2026</td>
+                                    <td>Dibuka (45/100)</td>
+                                    <td><button class="btn btn-outline">Lihat Data</button></td>
+                                </tr>
+                                <tr>
+                                    <td>Rapat Pleno Tengah Tahun</td>
+                                    <td>28 Okt 2026</td>
+                                    <td>Internal (Tertutup)</td>
+                                    <td><button class="btn btn-outline">Detail</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Sisi Kanan: Aksi Cepat (Bypass menu berlapis) -->
+                    <div>
+                        <div class="panel">
+                            <div class="panel-header">Aksi Cepat</div>
+                            <div class="panel-body">
+                                <div class="quick-action-grid">
+                                    <a href="#" class="quick-action-btn" onclick="switchView('form-kegiatan', document.querySelectorAll('.nav-link')[1])">
+                                        <i class="ph ph-plus-circle" style="font-size: 24px;"></i>
+                                        Buat Kegiatan Baru
+                                    </a>
+                                    <a href="#" class="quick-action-btn" onclick="switchView('presensi', document.querySelectorAll('.nav-link')[5])">
+                                        <i class="ph ph-scan" style="font-size: 24px;"></i>
+                                        Buka Presensi
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel">
+                            <div class="panel-header">Tugas Tertunda</div>
+                            <div class="panel-body">
+                                <ul style="list-style: none; padding: 0; font-size: 13px;">
+                                    <li style="padding-bottom: 10px; border-bottom: 1px solid #eee; margin-bottom: 10px;">
+                                        <strong style="color: var(--action-danger)">H-3 Batas LPJ:</strong> Pengenalan Kampus Mahasiswa Baru
+                                        <br><a href="#" style="color: var(--action-primary); text-decoration: none;">Unggah Dokumen &rarr;</a>
+                                    </li>
+                                    <li>
+                                        <strong>Menunggu Persetujuan:</strong> Proposal Dies Natalis
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-kegiatan" class="view-section">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Program Kerja & Kegiatan</h1>
+                        <p class="page-desc">Kelola seluruh arsip dan acara aktif.</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="switchView('form-kegiatan', this)"><i class="ph ph-plus"></i> Tambah Kegiatan</button>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header" style="background: white;">
+                        <!-- Filter fungsional -->
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <select class="form-control" style="width: 150px; padding: 4px 8px; height: auto;">
+                                <option>Periode 2026/2027</option>
+                                <option>Periode 2025/2026</option>
+                            </select>
+                            <select class="form-control" style="width: 150px; padding: 4px 8px; height: auto;">
+                                <option>Semua Status</option>
+                                <option>Sedang Berjalan</option>
+                                <option>Draft</option>
+                            </select>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Cari nama kegiatan..." style="width: 250px; padding: 4px 8px; height: auto;">
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px;">No</th>
+                                <th>Nama Kegiatan</th>
+                                <th>Ketua Pelaksana</th>
+                                <th>Tanggal Pelaksanaan</th>
+                                <th>Status</th>
+                                <th>Opsi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td><strong>Seminar Nasional Teknologi</strong></td>
+                                <td>Budi Santoso</td>
+                                <td>12 Okt 2026</td>
+                                <td><span class="status-box status-jalan">Berjalan</span></td>
+                                <td>
+                                    <button class="btn btn-outline"><i class="ph ph-pencil-simple"></i> Edit</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Latihan Dasar Kepemimpinan (LDK)</td>
+                                <td>Siti Aminah</td>
+                                <td>20 Okt 2026</td>
+                                <td><span class="status-box status-jalan">Berjalan</span></td>
+                                <td>
+                                    <button class="btn btn-outline"><i class="ph ph-pencil-simple"></i> Edit</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>Studi Banding Universitas X</td>
+                                <td>Andi Wijaya</td>
+                                <td>-</td>
+                                <td><span class="status-box status-draft">Draft Proposal</span></td>
+                                <td>
+                                    <button class="btn btn-outline"><i class="ph ph-pencil-simple"></i> Edit</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="view-form-kegiatan" class="view-section">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Buat Kegiatan Baru</h1>
+                        <p class="page-desc">Isi kelengkapan data kegiatan. Anda dapat menyimpannya sebagai Draft.</p>
+                    </div>
+                    <button class="btn btn-outline" onclick="switchView('kegiatan', document.querySelectorAll('.nav-link')[1])">Batal</button>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-body">
+                        <!-- Lebar form dibatasi agar mata tidak lelah membaca dari ujung ke ujung -->
+                        <div class="form-group">
+                            <label class="form-label">Nama Kegiatan <span style="color: red;">*</span></label>
+                            <input type="text" class="form-control" placeholder="Contoh: Seminar Nasional Teknologi 2026">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Kategori / Divisi Penyelenggara</label>
+                            <select class="form-control">
+                                <option>Pilih Divisi...</option>
+                                <option>Divisi Pendidikan</option>
+                                <option>Divisi Humas</option>
+                                <option>Divisi Pengabdian Masyarakat</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" style="display: flex; gap: 15px;">
+                            <div style="flex: 1;">
+                                <label class="form-label">Tanggal Mulai Acara</label>
+                                <input type="date" class="form-control">
+                            </div>
+                            <div style="flex: 1;">
+                                <label class="form-label">Tanggal Selesai Acara</label>
+                                <input type="date" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Kapasitas Maksimal Peserta</label>
+                            <input type="number" class="form-control" placeholder="Contoh: 150" style="width: 150px;">
+                            <small style="color: var(--text-muted); display: block; margin-top: 5px;">Biarkan kosong jika kuota tidak terbatas.</small>
+                        </div>
+                        
+                        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 30px 0; max-width: 600px;">
+
+                        <div class="form-group">
+                            <button class="btn btn-primary" onclick="alert('Ini hanya simulasi UI.'); switchView('kegiatan', document.querySelectorAll('.nav-link')[1]);">Simpan & Terbitkan</button>
+                            <button class="btn btn-outline">Simpan sebagai Draft</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-presensi" class="view-section">
+                <div class="page-header" style="justify-content: center; text-align: center; display: block;">
+                    <h1 class="page-title">Sistem Presensi Acara</h1>
+                    <select class="form-control" style="width: auto; margin: 10px auto; font-size: 16px; font-weight: bold; background: #e8f4f8; border-color: #b8daff;">
+                        <option>Seminar Nasional Teknologi (Hari Ini)</option>
+                        <option>Latihan Dasar Kepemimpinan (Akan datang)</option>
+                    </select>
+                </div>
+
+                <!-- Desain Kiosk: Minim distraksi, fokus pada input data cepat -->
+                <div class="panel presensi-kiosk">
+                    <div class="panel-body" style="padding: 40px 20px;">
+                        <label class="form-label" style="font-size: 16px;">Scan Barcode KTM atau Ketik NIM Peserta:</label>
+                        <input type="text" class="form-control presensi-input" placeholder="Masukkan NIM..." autofocus>
+                        <button class="btn btn-primary" style="font-size: 16px; padding: 10px 30px;"><i class="ph ph-check-circle"></i> Catat Kehadiran (Enter)</button>
+                        
+                        <div style="margin-top: 40px; text-align: left;">
+                            <h3 style="font-size: 14px; color: var(--text-muted); margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px;">Riwayat Scan Terakhir</h3>
+                            <table class="data-table" style="font-size: 12px;">
+                                <tbody>
+                                    <tr>
+                                        <td><i class="ph ph-check-circle" style="color: var(--action-success); font-size: 16px;"></i></td>
+                                        <td><strong>220101001</strong></td>
+                                        <td>Ahmad Fathoni</td>
+                                        <td style="text-align: right; color: var(--text-muted);">10:45:12</td>
+                                    </tr>
+                                    <tr>
+                                        <td><i class="ph ph-check-circle" style="color: var(--action-success); font-size: 16px;"></i></td>
+                                        <td><strong>220101089</strong></td>
+                                        <td>Nadia Putri</td>
+                                        <td style="text-align: right; color: var(--text-muted);">10:44:50</td>
+                                    </tr>
+                                    <!-- Indikator error jika peserta tidak terdaftar -->
+                                    <tr style="background-color: #fff3f3;">
+                                        <td><i class="ph ph-x-circle" style="color: var(--action-danger); font-size: 16px;"></i></td>
+                                        <td style="color: var(--action-danger);"><strong>200999111</strong></td>
+                                        <td style="color: var(--action-danger);">Data tidak ditemukan di sistem pendaftaran</td>
+                                        <td style="text-align: right; color: var(--text-muted);">10:42:01</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <script>
+        function switchView(viewId, navElement) {
+            // 1. Sembunyikan semua section
+            document.querySelectorAll('.view-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // 2. Tampilkan section yang dituju
+            const targetView = document.getElementById('view-' + viewId);
+            if(targetView) {
+                targetView.classList.add('active');
+            }
+
+            // 3. Update Breadcrumb agar user punya orientasi lokasi
+            const breadcrumb = document.getElementById('breadcrumb');
+            const menuNameMap = {
+                'dashboard': 'Ringkasan',
+                'kegiatan': 'Proker & Kegiatan',
+                'form-kegiatan': 'Proker & Kegiatan / Tambah Acara',
+                'pendaftaran': 'Data Pendaftar',
+                'presensi': 'Sistem Presensi Lapangan',
+                'pengumuman': 'Pengumuman'
+            };
+            
+            if (menuNameMap[viewId]) {
+                const parts = menuNameMap[viewId].split(' / ');
+                if(parts.length > 1) {
+                     breadcrumb.innerHTML = `Beranda / ${parts[0]} / <span>${parts[1]}</span>`;
+                } else {
+                     breadcrumb.innerHTML = `Beranda / <span>${parts[0]}</span>`;
+                }
+            }
+
+            // 4. Update state aktif di Sidebar (jika diklik dari sidebar)
+            if (navElement && navElement.classList && navElement.classList.contains('nav-link')) {
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('active');
+                });
+                navElement.classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>

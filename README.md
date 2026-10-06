@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SIKOM BEM (Sistem Informasi dan Komunikasi BEM)
 
-## Getting Started
+Sistem Informasi untuk mengelola kegiatan, kehadiran, dokumen (proposal/LPJ), dan pendaftaran kepanitiaan di lingkungan Badan Eksekutif Mahasiswa (BEM).
 
-First, run the development server:
+## 🚀 Fitur Aplikasi
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. **Autentikasi & Role Management**
+   - Login untuk Mahasiswa dan Admin.
+   - Manajemen akses berdasarkan role (ADMIN, MAHASISWA, SuperAdmin).
+2. **Manajemen Acara (Event Management)**
+   - Pembuatan dan pengelolaan acara (termasuk status dan visibilitas).
+   - Pendaftaran acara oleh mahasiswa.
+3. **Sistem Presensi (Attendance)**
+   - Presensi menggunakan QR Code, Token unik, maupun secara Manual.
+   - Fitur ekspor data kehadiran.
+4. **Manajemen Dokumen (Document Tracking)**
+   - Pengajuan dan pelacakan status dokumen seperti Proposal dan LPJ.
+5. **Rekrutmen Kepanitiaan (Committee Recruitment)**
+   - Pendaftaran divisi kepanitiaan dengan pertanyaan kustom (Custom Questions).
+   - Penilaian dan pengelolaan status kelulusan peserta (Divisi 1 atau Divisi 2).
+6. **Sistem Poin Mahasiswa**
+   - Pemberian poin keaktifan mahasiswa.
+7. **Pengumuman (Announcements)**
+   - Publikasi informasi/pengumuman terbaru kepada seluruh pengguna sistem.
+8. **Audit Trail (Audit Logs)**
+   - Log sistem untuk mencatat aktivitas penting admin atau pengguna.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠️ Cara Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Ikuti langkah-langkah berikut untuk menjalankan project di environment lokal:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Clone Repository (Jika belum)**
+   ```bash
+   git clone https://github.com/rwbu69/sikom-bem.git
+   cd sikom-bem
+   ```
 
-## Learn More
+2. **Install Dependencies**
+   Pastikan Anda telah menginstal Node.js versi 18+.
+   ```bash
+   npm install
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+3. **Setup Database**
+   Aplikasi ini menggunakan SQLite untuk proses development (`dev.db`). Anda hanya perlu melakukan push schema Prisma ke database:
+   ```bash
+   npx prisma db push
+   ```
+   *(Catatan: Jika diperlukan seeding data awal, jalankan `npx prisma db seed`)*
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+4. **Jalankan Development Server**
+   ```bash
+   npm run dev
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🧪 Cara Tes Aplikasinya Jalan atau Tidak
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Pastikan proses `npm run dev` pada terminal berjalan sukses tanpa pesan *error* merah.
+2. Buka browser kesayangan Anda dan kunjungi URL **[http://localhost:3000](http://localhost:3000)**.
+3. Jika antarmuka/halaman *login* atau beranda berhasil dimuat dengan baik, tandanya aplikasi berjalan sempurna.
+4. Coba melakukan interaksi sederhana seperti membuka *dashboard* admin atau *dashboard* mahasiswa untuk memastikan *routing* bekerja.

@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Informasi Kegiatan Organisasi Mahasiswa (SIKOM)</title>
+    
+    <style>
+        :root {
+            /* Professional Academic Palette - Solid colors, no gradients */
+            --bg-body: #f3f4f6;
+            --bg-surface: #ffffff;
+            --bg-sidebar: #111827;
+            
+            /* Primary Accent: Deep Forest Green (Academic) */
+            --brand-primary: #047857;
+            --brand-hover: #065f46;
+            
+            /* Text Colors */
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --text-sidebar: #d1d5db;
+            --text-sidebar-active: #ffffff;
+            
+            /* UI Elements */
+            --border-color: #e5e7eb;
+            --table-hover: #f9fafb;
+            --danger: #dc2626;
+            --success: #16a34a;
+            
+            /* Subtle rounding, NOT bento-box heavy curves */
+            --radius-sm: 2px;
+            --radius-md: 4px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            /* Using system fonts - avoiding Inter explicitly */
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-size: 14px;
+            line-height: 1.5;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Layout */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            color: var(--text-sidebar);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #374151;
+        }
+
+        .sidebar-header h1 {
+            color: #ffffff;
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-header p {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 12px 0;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            padding: 0 12px;
+            margin-bottom: 4px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            color: var(--text-sidebar);
+            text-decoration: none;
+            border-radius: var(--radius-sm);
+            transition: background-color 0.15s, color 0.15s;
+        }
+
+        .nav-link:hover {
+            background-color: #374151;
+            color: #ffffff;
+        }
+
+        .nav-link.active {
+            background-color: var(--brand-primary);
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .section-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #6b7280;
+            font-weight: 600;
+            margin: 20px 24px 8px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Main Content Layout */
+        .main-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Top Header */
+        .top-header {
+            background-color: var(--bg-surface);
+            height: 60px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            flex-shrink: 0;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .avatar {
+            width: 32px;
+            height: 32px;
+            background-color: var(--brand-primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .content-area {
+            padding: 24px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        /* Functional Panels instead of Bento boxes */
+        .panel {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            margin-bottom: 24px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02); /* Extremely subtle, purely for depth separation */
+        }
+
+        .panel-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fcfcfc;
+        }
+
+        .panel-title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .panel-body {
+            padding: 20px;
+        }
+
+        /* Grid for stats (Structured, not floating) */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--bg-surface);
+            margin-bottom: 24px;
+        }
+
+        .stat-item {
+            padding: 20px;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .stat-item:last-child {
+            border-right: none;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        /* Standardized Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.15s ease;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background-color: var(--brand-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--brand-hover);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border-color: var(--border-color);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background-color: #f3f4f6;
+        }
+
+        /* Dense Data Tables */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8fafc;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: var(--table-hover);
+        }
+
+        /* Status Badges - Flat, no pill curves */
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+        }
+
+        .status-active { background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .status-draft { background-color: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; }
+        .status-ended { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-size: 0.875rem;
+            color: var(--text-main);
+            background-color: var(--bg-surface);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--brand-primary);
+            box-shadow: 0 0 0 1px var(--brand-primary);
+        }
+
+        /* View Switching Logic */
+        .view-section {
+            display: none;
+        }
+        .view-section.active {
+            display: block;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            background: var(--bg-surface);
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            align-items: center;
+        }
+
+        /* Mobile specific */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                z-index: 50;
+                height: 100%;
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .menu-toggle {
+                display: block;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .stat-item {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h1>SIKOM</h1>
+            <p>BEM Fakultas Ilmu Komputer</p>
+        </div>
+        
+        <div class="section-label">Menu Utama</div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="#" class="nav-link active" onclick="switchView('dashboard', this)">Dashboard</a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="switchView('kegiatan', this)">Manajemen Kegiatan</a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="switchView('pendaftaran', this)">Data Pendaftaran</a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="switchView('presensi', this)">Presensi (Kehadiran)</a>
+            </li>
+        </ul>
+
+        <div class="section-label">Manajemen</div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="switchView('pengumuman', this)">Pengumuman</a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="switchView('dokumentasi', this)">Arsip Dokumentasi</a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="switchView('laporan', this)">Laporan & Export</a>
+            </li>
+        </ul>
+    </aside>
+
+    <div class="main-wrapper">
+        <header class="top-header">
+            <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+            <div style="font-weight: 500; color: var(--text-muted);">
+                Tahun Ajaran 2026/2027
+            </div>
+            <div class="user-profile">
+                <div style="text-align: right;">
+                    <div style="font-weight: 500; font-size: 0.875rem;">Admin HIMA</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Divisi Kesekretariatan</div>
+                </div>
+                <div class="avatar">AH</div>
+            </div>
+        </header>
+
+        <main class="content-area">
+            
+            <!-- VIEW: DASHBOARD -->
+            <div id="view-dashboard" class="view-section active">
+                <div class="page-header">
+                    <h2 class="page-title">Ikhtisar Organisasi</h2>
+                    <button class="btn btn-primary" onclick="switchView('kegiatan')">+ Buat Kegiatan Baru</button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-label">Total Kegiatan Berjalan</div>
+                        <div class="stat-value">4</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Kegiatan Selesai (Semester Ini)</div>
+                        <div class="stat-value">12</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Total Peserta Terdaftar</div>
+                        <div class="stat-value">845</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">LPJ Menunggu Validasi</div>
+                        <div class="stat-value" style="color: var(--danger);">2</div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3 class="panel-title">Jadwal Kegiatan Terdekat (7 Hari Kedepan)</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tanggal</th>
+                                    <th>Nama Kegiatan</th>
+                                    <th>Lokasi</th>
+                                    <th>Penanggung Jawab</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>08 Okt 2026, 09:00</td>
+                                    <td>Workshop UI/UX Enterprise</td>
+                                    <td>Auditorium Gedung C</td>
+                                    <td>Faisal Rahman</td>
+                                    <td><span class="status status-active">Pendaftaran Dibuka</span></td>
+                                </tr>
+                                <tr>
+                                    <td>10 Okt 2026, 13:00</td>
+                                    <td>Rapat Evaluasi Triwulan 3</td>
+                                    <td>Ruang Rapat BEM</td>
+                                    <td>Dina Melati</td>
+                                    <td><span class="status status-draft">Persiapan Internal</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: KEGIATAN -->
+            <div id="view-kegiatan" class="view-section">
+                <div class="page-header">
+                    <h2 class="page-title">Daftar Kegiatan</h2>
+                    <button class="btn btn-primary">Tambah Kegiatan</button>
+                </div>
+
+                <div class="toolbar">
+                    <div style="flex-grow: 1;">
+                        <input type="text" class="form-control" placeholder="Cari nama kegiatan atau kode..." style="max-width: 300px;">
+                    </div>
+                    <select class="form-control" style="width: auto;">
+                        <option>Semua Status</option>
+                        <option>Pendaftaran Dibuka</option>
+                        <option>Sedang Berjalan</option>
+                        <option>Selesai</option>
+                    </select>
+                    <select class="form-control" style="width: auto;">
+                        <option>Tahun 2026</option>
+                        <option>Tahun 2025</option>
+                    </select>
+                </div>
+
+                <div class="panel">
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Kode</th>
+                                    <th>Nama Program / Kegiatan</th>
+                                    <th>Tanggal Pelaksanaan</th>
+                                    <th>Target Peserta</th>
+                                    <th>Status</th>
+                                    <th style="text-align: right;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>PRG-012</td>
+                                    <td style="font-weight: 500;">Workshop UI/UX Enterprise</td>
+                                    <td>08-09 Okt 2026</td>
+                                    <td>150 orang</td>
+                                    <td><span class="status status-active">Aktif</span></td>
+                                    <td style="text-align: right;">
+                                        <button class="btn btn-outline" style="padding: 4px 8px;">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>PRG-011</td>
+                                    <td style="font-weight: 500;">Latihan Dasar Kepemimpinan (LDK)</td>
+                                    <td>20-22 Sep 2026</td>
+                                    <td>80 orang</td>
+                                    <td><span class="status status-ended">Selesai</span></td>
+                                    <td style="text-align: right;">
+                                        <button class="btn btn-outline" style="padding: 4px 8px;">Detail</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: PENDAFTARAN -->
+            <div id="view-pendaftaran" class="view-section">
+                <div class="page-header">
+                    <h2 class="page-title">Manajemen Data Pendaftaran</h2>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <div style="display: flex; gap: 16px; align-items: center; width: 100%;">
+                            <label class="form-label" style="margin: 0;">Pilih Kegiatan:</label>
+                            <select class="form-control" style="max-width: 400px;">
+                                <option>Workshop UI/UX Enterprise (Aktif)</option>
+                                <option>Latihan Dasar Kepemimpinan (Selesai)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div style="padding: 16px; border-bottom: 1px solid var(--border-color); background: #fdfdfd; display: flex; justify-content: space-between;">
+                        <div>Total Terdaftar: <strong>142/150</strong> Mahasiswa</div>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-outline">Kirim Email Massal</button>
+                            <button class="btn btn-primary" onclick="alert('Membuka modal tambah manual...')">Tambah Manual</button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>NIM</th>
+                                    <th>Nama Lengkap</th>
+                                    <th>Program Studi</th>
+                                    <th>Tgl Daftar</th>
+                                    <th>Verifikasi Pembayaran</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>2301011045</td>
+                                    <td>Bagas Dwi Prakoso</td>
+                                    <td>Sistem Informasi</td>
+                                    <td>01 Okt 2026</td>
+                                    <td><span style="color: var(--success); font-weight: 600;">Lunas</span></td>
+                                </tr>
+                                <tr>
+                                    <td>2301021008</td>
+                                    <td>Siti Rahmawati</td>
+                                    <td>Teknik Informatika</td>
+                                    <td>02 Okt 2026</td>
+                                    <td>
+                                        <select class="form-control" style="padding: 2px 6px; font-size: 0.75rem; width: auto;">
+                                            <option>Menunggu Validasi</option>
+                                            <option>Lunas</option>
+                                            <option>Ditolak</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2401011099</td>
+                                    <td>Kevin Alexander</td>
+                                    <td>Sistem Informasi</td>
+                                    <td>02 Okt 2026</td>
+                                    <td><span style="color: var(--success); font-weight: 600;">Lunas</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: PRESENSI -->
+            <div id="view-presensi" class="view-section">
+                <div class="page-header">
+                    <h2 class="page-title">Sistem Pencatatan Presensi</h2>
+                </div>
+
+                <div class="stats-grid" style="grid-template-columns: 2fr 1fr; background: transparent; border: none;">
+                    <div class="panel" style="margin-bottom: 0;">
+                        <div class="panel-header">
+                            <h3 class="panel-title">Input Kehadiran (Hari H)</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label class="form-label">Kegiatan Berjalan:</label>
+                                <select class="form-control" disabled>
+                                    <option>Workshop UI/UX Enterprise - Sesi 1</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group" style="margin-top: 24px;">
+                                <label class="form-label">Scan Barcode KTM / Ketik NIM:</label>
+                                <div style="display: flex; gap: 8px;">
+                                    <input type="text" class="form-control" placeholder="Arahkan kursor ke sini saat melakukan scan..." autofocus style="font-size: 1.25rem; padding: 12px;">
+                                    <button class="btn btn-primary" style="white-space: nowrap;">Catat Hadir</button>
+                                </div>
+                                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px;">Sistem akan otomatis mencatat waktu kehadiran berdasarkan server (WIB).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel" style="margin-bottom: 0; margin-left: 16px;">
+                        <div class="panel-header">
+                            <h3 class="panel-title">Statistik Sesi Ini</h3>
+                        </div>
+                        <div class="panel-body" style="text-align: center; padding-top: 40px;">
+                            <div style="font-size: 3rem; font-weight: 700; color: var(--brand-primary); line-height: 1;">87</div>
+                            <div style="color: var(--text-muted); margin-top: 8px;">Peserta Hadir</div>
+                            <div style="margin-top: 16px; font-size: 0.875rem; border-top: 1px solid var(--border-color); padding-top: 16px;">
+                                Dari total 150 pendaftar (58%)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: DOKUMENTASI -->
+            <div id="view-dokumentasi" class="view-section">
+                <div class="page-header">
+                    <h2 class="page-title">Arsip Dokumentasi & LPJ</h2>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-body">
+                        <p style="margin-bottom: 16px;">Unggah dokumen Laporan Pertanggungjawaban (LPJ), Notulensi, dan foto kegiatan ke repositori server.</p>
+                        
+                        <div style="border: 1px dashed #9ca3af; padding: 40px; text-align: center; background-color: #f8fafc; border-radius: var(--radius-sm); margin-bottom: 24px;">
+                            <p style="margin-bottom: 12px; font-weight: 500;">Seret dan lepas file di sini, atau klik tombol di bawah</p>
+                            <button class="btn btn-outline">Pilih File dari Komputer</button>
+                        </div>
+
+                        <h4 style="font-weight: 600; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Dokumen Terbaru</h4>
+                        <table style="width: 100%; font-size: 0.875rem;">
+                            <tbody>
+                                <tr>
+                                    <td style="width: 40px; text-align: center;">📄</td>
+                                    <td><strong>LPJ_LDK_2026_Final.pdf</strong><br><span style="color: var(--text-muted);">Diunggah oleh Faisal R. - 25 Sep 2026</span></td>
+                                    <td style="text-align: right;"><button class="btn btn-outline" style="padding: 2px 8px; font-size: 0.75rem;">Unduh</button></td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 40px; text-align: center;">📝</td>
+                                    <td><strong>Notulensi_Rapat_Akbar.docx</strong><br><span style="color: var(--text-muted);">Diunggah oleh Admin - 10 Sep 2026</span></td>
+                                    <td style="text-align: right;"><button class="btn btn-outline" style="padding: 2px 8px; font-size: 0.75rem;">Unduh</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: LAPORAN -->
+            <div id="view-laporan" class="view-section">
+                <div class="page-header">
+                    <h2 class="page-title">Ekspor Data & Laporan</h2>
+                </div>
+
+                <div class="panel" style="max-width: 600px;">
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <label class="form-label">Modul Data</label>
+                            <select class="form-control">
+                                <option>Data Demografi Pendaftar</option>
+                                <option>Rekapitulasi Kehadiran (Presensi)</option>
+                                <option>Daftar Kegiatan Tahunan</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Parameter Kegiatan</label>
+                            <select class="form-control">
+                                <option>Semua Kegiatan (Tahun Berjalan)</option>
+                                <option>Workshop UI/UX Enterprise</option>
+                                <option>Latihan Dasar Kepemimpinan (LDK)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Format Output</label>
+                            <div style="display: flex; gap: 16px; margin-top: 8px;">
+                                <label style="display: flex; align-items: center; gap: 8px;"><input type="radio" name="format" checked> Microsoft Excel (.xlsx)</label>
+                                <label style="display: flex; align-items: center; gap: 8px;"><input type="radio" name="format"> CSV (.csv)</label>
+                                <label style="display: flex; align-items: center; gap: 8px;"><input type="radio" name="format"> Dokumen PDF (.pdf)</label>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 24px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+                            <button class="btn btn-primary" onclick="alert('Memulai proses ekspor data...')">Proses Ekspor</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Placeholder for unfinished views -->
+            <div id="view-pengumuman" class="view-section">
+                <div class="page-header">
+                    <h2 class="page-title">Manajemen Pengumuman</h2>
+                </div>
+                <div class="panel">
+                    <div class="panel-body">
+                        Modul publikasi pengumuman ke mahasiswa sedang dalam pengembangan.
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // Simple View Router
+        function switchView(viewId, clickedLink = null) {
+            // Hide all views
+            document.querySelectorAll('.view-section').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Show selected view
+            const targetView = document.getElementById('view-' + viewId);
+            if (targetView) {
+                targetView.classList.add('active');
+            }
+
+            // Update active state in sidebar navigation
+            if (clickedLink) {
+                document.querySelectorAll('.nav-link').forEach(el => {
+                    el.classList.remove('active');
+                });
+                clickedLink.classList.add('active');
+                
+                // Close sidebar on mobile after clicking a link
+                if (window.innerWidth <= 768) {
+                    toggleSidebar();
+                }
+            } else {
+                // If called programmatically (like from dashboard button)
+                document.querySelectorAll('.nav-link').forEach(el => {
+                    el.classList.remove('active');
+                    if(el.getAttribute('onclick').includes(`'${viewId}'`)) {
+                        el.classList.add('active');
+                    }
+                });
+            }
+        }
+
+        // Mobile Sidebar Toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+    </script>
+</body>
+</html>

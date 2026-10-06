@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIKOM - Portal Tata Usaha Organisasi</title>
+    
+    <style>
+        :root {
+            /* Institutional Palette */
+            --color-primary: #003366; /* Deep Navy */
+            --color-primary-light: #004c99;
+            --color-accent: #cc0000; /* Academic Crimson */
+            --color-bg-page: #f4f4f4;
+            --color-bg-panel: #ffffff;
+            
+            --color-text-main: #222222;
+            --color-text-muted: #555555;
+            --color-border: #cccccc;
+            
+            /* Status Colors */
+            --color-status-ok: #006633;
+            --color-status-warn: #cc8800;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            /* Strict standard sans-serif stack, completely avoiding modern web fonts like Inter/Roboto */
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background-color: var(--color-bg-page);
+            color: var(--color-text-main);
+            font-size: 14px;
+            line-height: 1.4;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Header Layout */
+        .portal-header {
+            background-color: var(--color-primary);
+            color: #ffffff;
+            padding: 0 20px;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 56px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .brand-title {
+            font-size: 18px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            border-right: 1px solid #4d79ff;
+            padding-right: 15px;
+        }
+
+        .brand-subtitle {
+            font-size: 13px;
+            color: #b3c6ff;
+        }
+
+        .user-menu {
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid #b3c6ff;
+            color: #ffffff;
+            padding: 4px 10px;
+            cursor: pointer;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .logout-btn:hover {
+            background: #ffffff;
+            color: var(--color-primary);
+        }
+
+        /* Main Navigation */
+        .portal-nav {
+            background-color: var(--color-bg-panel);
+            border-bottom: 1px solid var(--color-border);
+            box-shadow: 0 1px 0 rgba(0,0,0,0.05); /* Very subtle separation, not a floating shadow */
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            padding: 14px 20px;
+            color: var(--color-text-muted);
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 13px;
+            text-transform: uppercase;
+            border-bottom: 3px solid transparent;
+            transition: all 0.1s;
+            white-space: nowrap;
+        }
+
+        .nav-tab:hover {
+            color: var(--color-primary);
+            background-color: #f9f9f9;
+        }
+
+        .nav-tab.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-accent);
+            background-color: #f9f9f9;
+        }
+
+        /* Content Area */
+        .main-content {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        .section-header {
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--color-primary);
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: normal;
+            color: var(--color-primary);
+        }
+
+        /* Flat Panels (No rounded corners, no shadows) */
+        .panel {
+            background: var(--color-bg-panel);
+            border: 1px solid var(--color-border);
+            margin-bottom: 25px;
+        }
+
+        .panel-header {
+            background-color: #f0f0f0;
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--color-border);
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .panel-body {
+            padding: 20px;
+        }
+
+        /* Data Grids / Key Value Pairs */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .info-block {
+            border-left: 4px solid var(--color-primary-light);
+            padding-left: 15px;
+        }
+
+        .info-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--color-text-muted);
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--color-text-main);
+        }
+
+        /* Strict Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .data-table th, .data-table td {
+            border: 1px solid var(--color-border);
+            padding: 10px 12px;
+            text-align: left;
+        }
+
+        .data-table th {
+            background-color: #e6e6e6;
+            font-weight: bold;
+            color: var(--color-text-main);
+        }
+
+        .data-table tbody tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #f0f4f8;
+        }
+
+        /* Flat Status Tags */
+        .tag {
+            display: inline-block;
+            padding: 3px 6px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border: 1px solid currentColor;
+        }
+        .tag-active { color: var(--color-status-ok); background: #e6f2ec; }
+        .tag-pending { color: var(--color-status-warn); background: #fff5e6; }
+        .tag-closed { color: var(--color-text-muted); background: #eeeeee; }
+
+        /* UI Elements */
+        .btn {
+            display: inline-block;
+            padding: 8px 15px;
+            font-size: 13px;
+            font-weight: bold;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            border: 1px solid transparent;
+            /* Zero border radius for institutional look */
+            border-radius: 0; 
+        }
+
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: #ffffff;
+            border-color: var(--color-primary);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--color-primary-light);
+        }
+
+        .btn-secondary {
+            background-color: #f0f0f0;
+            color: var(--color-text-main);
+            border-color: var(--color-border);
+        }
+
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+
+        /* Forms */
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .form-label {
+            min-width: 150px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .form-control {
+            flex-grow: 1;
+            padding: 8px 10px;
+            border: 1px solid var(--color-border);
+            font-family: inherit;
+            font-size: 13px;
+            border-radius: 0;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            background-color: #fafff5; /* Slight tint on focus, not a glow */
+        }
+
+        .toolbar {
+            background: #f9f9f9;
+            border: 1px solid var(--color-border);
+            padding: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .header-container { flex-direction: column; height: auto; padding: 10px 0; gap: 10px; }
+            .nav-container { flex-direction: column; }
+            .nav-tab { border-bottom: none; border-left: 3px solid transparent; }
+            .nav-tab.active { border-bottom-color: transparent; border-left-color: var(--color-accent); }
+            .form-row { flex-direction: column; align-items: flex-start; gap: 5px; }
+            .form-label { min-width: auto; }
+            .data-table { display: block; overflow-x: auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="portal-header">
+        <div class="header-container">
+            <div class="brand">
+                <div class="brand-title">SIKOM PORTAL</div>
+                <div class="brand-subtitle">Sistem Informasi Kegiatan Organisasi Mahasiswa</div>
+            </div>
+            <div class="user-menu">
+                <span>Login: <strong>Admin.Sekretaris</strong></span>
+                <button class="logout-btn">Keluar</button>
+            </div>
+        </div>
+    </header>
+
+    <nav class="portal-nav">
+        <div class="nav-container">
+            <a href="#" class="nav-tab active" onclick="navigate('ikhtisar', this)">Ikhtisar</a>
+            <a href="#" class="nav-tab" onclick="navigate('manajemen_kegiatan', this)">Manajemen Kegiatan</a>
+            <a href="#" class="nav-tab" onclick="navigate('pendaftaran', this)">Data Pendaftaran</a>
+            <a href="#" class="nav-tab" onclick="navigate('presensi', this)">Presensi & Kehadiran</a>
+            <a href="#" class="nav-tab" onclick="navigate('dokumen', this)">Arsip Dokumen</a>
+            <a href="#" class="nav-tab" onclick="navigate('laporan', this)">Laporan</a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        
+        <!-- MODULE: IKHTISAR (DASHBOARD) -->
+        <div id="mod-ikhtisar" class="view-section active">
+            <div class="section-header">
+                <h1 class="section-title">Ikhtisar Semester Genap 2026/2027</h1>
+            </div>
+
+            <div class="panel">
+                <div class="panel-body">
+                    <div class="info-grid">
+                        <div class="info-block">
+                            <div class="info-label">Kegiatan Berjalan</div>
+                            <div class="info-value">3 Program</div>
+                        </div>
+                        <div class="info-block">
+                            <div class="info-label">Total Peserta Terdaftar (Aktif)</div>
+                            <div class="info-value">428 Mahasiswa</div>
+                        </div>
+                        <div class="info-block">
+                            <div class="info-label">LPJ Belum Diserahkan</div>
+                            <div class="info-value" style="color: var(--color-accent);">1 Dokumen</div>
+                        </div>
+                        <div class="info-block">
+                            <div class="info-label">Total Kegiatan (Tahun Ini)</div>
+                            <div class="info-value">14 Program</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">Jadwal Pelaksanaan Terdekat</div>
+                <div class="panel-body" style="padding: 0;">
+                    <table class="data-table" style="border: none;">
+                        <thead>
+                            <tr>
+                                <th style="border-top: none; border-left: none;">Tanggal</th>
+                                <th style="border-top: none;">Nama Program</th>
+                                <th style="border-top: none;">Lokasi</th>
+                                <th style="border-top: none; border-right: none;">Status Pendaftaran</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border-left: none;">12 Okt 2026</td>
+                                <td>Seminar Nasional Teknologi AI</td>
+                                <td>Gedung Rektorat Lt.3</td>
+                                <td style="border-right: none;"><span class="tag tag-active">DIBUKA</span> (120/150)</td>
+                            </tr>
+                            <tr>
+                                <td style="border-left: none;">20 Okt 2026</td>
+                                <td>Musyawarah Anggota HIMA</td>
+                                <td>Ruang Sidang F-102</td>
+                                <td style="border-right: none;"><span class="tag tag-pending">TUTUP SEMENTARA</span></td>
+                            </tr>
+                            <tr>
+                                <td style="border-bottom: none; border-left: none;">05 Nov 2026</td>
+                                <td style="border-bottom: none;">Lomba Pemrograman Competitive</td>
+                                <td style="border-bottom: none;">Lab Komputer Terpadu</td>
+                                <td style="border-bottom: none; border-right: none;"><span class="tag tag-closed">PERSIAPAN</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODULE: MANAJEMEN KEGIATAN -->
+        <div id="mod-manajemen_kegiatan" class="view-section">
+            <div class="section-header">
+                <h1 class="section-title">Indeks Kegiatan Organisasi</h1>
+                <button class="btn btn-primary">Formulir Kegiatan Baru</button>
+            </div>
+
+            <div class="toolbar">
+                <select class="form-control" style="width: 200px;">
+                    <option>Semua Tahun Ajaran</option>
+                    <option>2026/2027</option>
+                    <option>2025/2026</option>
+                </select>
+                <input type="text" class="form-control" placeholder="Pencarian nama atau kode kegiatan...">
+                <button class="btn btn-secondary">Cari</button>
+            </div>
+
+            <div class="panel">
+                <div class="panel-body" style="padding: 0;">
+                    <table class="data-table" style="border: none;">
+                        <thead>
+                            <tr>
+                                <th style="border-top: none; border-left: none; width: 100px;">Kode</th>
+                                <th style="border-top: none;">Nama Kegiatan</th>
+                                <th style="border-top: none;">Penanggung Jawab</th>
+                                <th style="border-top: none;">Waktu Pelaksanaan</th>
+                                <th style="border-top: none;">Status</th>
+                                <th style="border-top: none; border-right: none; width: 150px; text-align: center;">Tindakan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border-left: none;">PRG-024</td>
+                                <td>Seminar Nasional Teknologi AI</td>
+                                <td>Ahmad Rizky (Ketua Pelaksana)</td>
+                                <td>12-13 Okt 2026</td>
+                                <td><span class="tag tag-active">Aktif</span></td>
+                                <td style="border-right: none; text-align: center;">
+                                    <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 11px;">UBAH</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border-left: none;">PRG-023</td>
+                                <td>Musyawarah Anggota HIMA</td>
+                                <td>Siti Aisyah (Sekjen)</td>
+                                <td>20 Okt 2026</td>
+                                <td><span class="tag tag-pending">Tertunda</span></td>
+                                <td style="border-right: none; text-align: center;">
+                                    <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 11px;">UBAH</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border-left: none; border-bottom: none;">PRG-022</td>
+                                <td style="border-bottom: none;">Diklat Ruang Angkatan 2026</td>
+                                <td style="border-bottom: none;">Budi Santoso (Kadiv PSDM)</td>
+                                <td style="border-bottom: none;">01-03 Sep 2026</td>
+                                <td style="border-bottom: none;"><span class="tag tag-closed">Selesai</span></td>
+                                <td style="border-right: none; border-bottom: none; text-align: center;">
+                                    <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 11px;">LIHAT</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODULE: DATA PENDAFTARAN -->
+        <div id="mod-pendaftaran" class="view-section">
+            <div class="section-header">
+                <h1 class="section-title">Data Pendaftaran Peserta</h1>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">Kriteria Filter</div>
+                <div class="panel-body">
+                    <div class="form-row">
+                        <label class="form-label">Pilih Kegiatan:</label>
+                        <select class="form-control">
+                            <option>Seminar Nasional Teknologi AI (120 Pendaftar)</option>
+                            <option>Lomba Pemrograman Competitive (45 Pendaftar)</option>
+                        </select>
+                        <button class="btn btn-primary">Muat Data</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="toolbar" style="justify-content: space-between; align-items: center;">
+                <div>Menampilkan <strong>120</strong> baris data.</div>
+                <div>
+                    <button class="btn btn-secondary">Tambah Manual</button>
+                    <button class="btn btn-secondary">Export Excel</button>
+                </div>
+            </div>
+
+            <div class="panel">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px; text-align: center;">No.</th>
+                            <th style="width: 150px;">NIM</th>
+                            <th>Nama Lengkap</th>
+                            <th>Fakultas / Prodi</th>
+                            <th>Tanggal Daftar</th>
+                            <th style="width: 120px;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="text-align: center;">1</td>
+                            <td>10123001</td>
+                            <td>Rina Kumalasari</td>
+                            <td>Fasilkom / Sistem Informasi</td>
+                            <td>01/10/2026 08:30</td>
+                            <td><span class="tag tag-active">Tervalidasi</span></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">2</td>
+                            <td>10123045</td>
+                            <td>Dimas Anggara</td>
+                            <td>Fasilkom / Teknik Informatika</td>
+                            <td>01/10/2026 09:15</td>
+                            <td><span class="tag tag-pending">Menunggu</span></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">3</td>
+                            <td>10223011</td>
+                            <td>Tania Putri</td>
+                            <td>FEB / Manajemen</td>
+                            <td>02/10/2026 14:20</td>
+                            <td><span class="tag tag-active">Tervalidasi</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- MODULE: PRESENSI -->
+        <div id="mod-presensi" class="view-section">
+            <div class="section-header">
+                <h1 class="section-title">Terminal Presensi Kegiatan</h1>
+            </div>
+
+            <div style="display: flex; gap: 25px; flex-wrap: wrap;">
+                
+                <div class="panel" style="flex: 2; min-width: 400px;">
+                    <div class="panel-header">Input Data Kehadiran</div>
+                    <div class="panel-body">
+                        <div class="form-row">
+                            <label class="form-label">Kegiatan Berjalan:</label>
+                            <select class="form-control">
+                                <option>Seminar Nasional Teknologi AI - Sesi Pagi</option>
+                            </select>
+                        </div>
+                        <div style="border-top: 1px solid var(--color-border); margin: 20px 0;"></div>
+                        
+                        <div style="background: #fdfdfd; border: 1px dashed #aaa; padding: 30px; text-align: center;">
+                            <label style="display: block; font-weight: bold; margin-bottom: 10px; font-size: 16px;">Pindai Barcode KTM / Input NIM</label>
+                            <div style="display: flex; gap: 10px; max-width: 400px; margin: 0 auto;">
+                                <input type="text" class="form-control" placeholder="Ketik NIM disini..." autofocus style="font-size: 18px; padding: 12px; text-align: center;">
+                                <button class="btn btn-primary">SUBMIT</button>
+                            </div>
+                            <p style="font-size: 12px; color: var(--color-text-muted); margin-top: 15px;">Waktu pencatatan disinkronisasi dengan server lokal.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel" style="flex: 1; min-width: 250px;">
+                    <div class="panel-header">Log Kehadiran Terakhir</div>
+                    <div class="panel-body" style="padding: 0;">
+                        <table class="data-table" style="border: none;">
+                            <tbody>
+                                <tr>
+                                    <td style="border-left: none; border-top: none;">
+                                        <strong>10123001</strong><br>
+                                        Rina Kumalasari
+                                    </td>
+                                    <td style="border-right: none; border-top: none; text-align: right; color: var(--color-status-ok); font-weight: bold;">
+                                        08:45:12
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border-left: none;">
+                                        <strong>10223011</strong><br>
+                                        Tania Putri
+                                    </td>
+                                    <td style="border-right: none; text-align: right; color: var(--color-status-ok); font-weight: bold;">
+                                        08:43:05
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- MODULE: LAPORAN -->
+        <div id="mod-laporan" class="view-section">
+            <div class="section-header">
+                <h1 class="section-title">Pembuatan Laporan & Ekspor Data</h1>
+            </div>
+
+            <div class="panel" style="max-width: 600px;">
+                <div class="panel-header">Parameter Laporan</div>
+                <div class="panel-body">
+                    <div class="form-row">
+                        <label class="form-label">Jenis Data:</label>
+                        <select class="form-control">
+                            <option>Rekapitulasi Kehadiran Peserta</option>
+                            <option>Data Demografi Pendaftar</option>
+                            <option>Daftar Riwayat Kegiatan Organisasi</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label">Kegiatan / Periode:</label>
+                        <select class="form-control">
+                            <option>-- Pilih Kegiatan --</option>
+                            <option>Seminar Nasional Teknologi AI</option>
+                            <option>Diklat Ruang Angkatan 2026</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label class="form-label">Format Berkas:</label>
+                        <div style="display: flex; gap: 20px; align-items: center; height: 35px;">
+                            <label><input type="radio" name="format" checked> CSV (Excel)</label>
+                            <label><input type="radio" name="format"> PDF</label>
+                        </div>
+                    </div>
+                    <div style="margin-top: 25px; text-align: right;">
+                        <button class="btn btn-primary">PROSES EKSPOR</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- MODULE: DOKUMEN (Placeholder) -->
+        <div id="mod-dokumen" class="view-section">
+            <div class="section-header">
+                <h1 class="section-title">Arsip Laporan Pertanggungjawaban (LPJ)</h1>
+            </div>
+            <div class="panel">
+                <div class="panel-body text-center">
+                    Modul pengarsipan dokumen sedang dalam tahap pemeliharaan.
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        /**
+         * Navigation Handler
+         * Switches the visible module and updates the active tab state.
+         */
+        function navigate(moduleId, clickedElement) {
+            // 1. Hide all modules
+            const modules = document.querySelectorAll('.view-section');
+            modules.forEach(mod => {
+                mod.classList.remove('active');
+            });
+
+            // 2. Remove active class from all tabs
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // 3. Show targeted module
+            const targetModule = document.getElementById('mod-' + moduleId);
+            if (targetModule) {
+                targetModule.classList.add('active');
+            }
+
+            // 4. Set clicked tab as active
+            if (clickedElement) {
+                clickedElement.classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>

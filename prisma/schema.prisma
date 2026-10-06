@@ -1,0 +1,148 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id           String   @id @default(cuid())
+  nim          String   @unique
+  name         String
+  password     String
+  role              String   @default("MAHASISWA") // ADMIN, MAHASISWA
+  isSuperAdmin      Boolean  @default(false)
+  isDefaultPassword Boolean  @default(true)
+  points            Int      @default(0)
+  whatsapp          String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  registrations Registration[]
+  attendances   Attendance[]
+  auditLogs     AuditLog[]
+  uploadedDocs  Document[] @relation("DocumentUploader")
+  committeeApps CommitteeApplication[]
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  name        String
+  description String?
+  location    String?
+  posterUrl   String?
+  startDate   DateTime
+  endDate     DateTime
+  capacity    Int?
+  visibility  String   @default("UMUM") // UMUM, INTERNAL
+  status      String   @default("DRAFT") // DRAFT, OPEN, ONGOING, COMPLETED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  registrations Registration[]
+  attendances   Attendance[]
+  documents     Document[]
+  committeeDivisions   CommitteeDivision[]
+  committeeApps        CommitteeApplication[]
+}
+
+model Registration {
+  id        String   @id @default(cuid())
+  userId    String
+  eventId   String
+  status    String   @default("PENDING") // PENDING, CONFIRMED, REJECTED
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id])
+  event Event @relation(fields: [eventId], references: [id])
+
+  @@unique([userId, eventId])
+}
+
+model Attendance {
+  id        String   @id @default(cuid())
+  userId    String
+  eventId   String
+  timestamp DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id])
+  event Event @relation(fields: [eventId], references: [id])
+
+  @@unique([userId, eventId])
+}
+
+model Announcement {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  details   String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+
+model Document {
+  id         String   @id @default(cuid())
+  eventId    String
+  type       String   // PROPOSAL, LPJ
+  status     String   @default("DRAFT") // DRAFT, SUBMITTED, REJECTED, APPROVED
+  fileUrl    String?
+  uploadedBy String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  event    Event @relation(fields: [eventId], references: [id])
+  uploader User  @relation(fields: [uploadedBy], references: [id], name: "DocumentUploader")
+}
+
+model CommitteeDivision {
+  id              String   @id @default(cuid())
+  eventId         String
+  name            String
+  quota           Int?
+  customQuestion1 String?
+  customQuestion2 String?
+
+  event        Event                  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  appliedAs1st CommitteeApplication[] @relation("Div1")
+  appliedAs2nd CommitteeApplication[] @relation("Div2")
+}
+
+model CommitteeApplication {
+  id          String   @id @default(cuid())
+  userId      String
+  eventId     String
+  division1Id String
+  division2Id String?
+  
+  reason      String   // max 300
+  experience  String?
+  whatsapp    String
+  
+  status      String   @default("PENDING") // PENDING, ACCEPTED_DIV1, ACCEPTED_DIV2, REJECTED
+  adminNotes  String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event     Event              @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  division1 CommitteeDivision  @relation(fields: [division1Id], references: [id], name: "Div1")
+  division2 CommitteeDivision? @relation(fields: [division2Id], references: [id], name: "Div2")
+
+  @@unique([userId, eventId])
+}

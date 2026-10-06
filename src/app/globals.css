@@ -1,26 +1,135 @@
 @import "tailwindcss";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* NOTE: tw-animate-css telah dihapus sesuai aturan Zero Decorative Animations */
+
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Radius dibatasi maksimal 8px secara global untuk menetralkan rounding ekstrem */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 8px;
+  --radius-2xl: 8px;
+  --radius-3xl: 8px;
+  --radius-4xl: 8px;
+
+  --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-heading);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  /* Warm Off-White Scheme */
+  --background: #faf9f8;
+  --foreground: #1c1917;
+  
+  --card: #ffffff;
+  --card-foreground: #1c1917;
+  
+  --popover: #ffffff;
+  --popover-foreground: #1c1917;
+  
+  /* Primary Accent: Defaulting to Deep Blue / Navy. Ganti HEX ini untuk merubah seluruh tema */
+  --primary: #0f3460;
+  --primary-foreground: #ffffff;
+  
+  --secondary: #f5f5f4;
+  --secondary-foreground: #1c1917;
+  
+  --muted: #f5f5f4;
+  --muted-foreground: #78716c;
+  
+  --accent: #f5f5f4;
+  --accent-foreground: #1c1917;
+  
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  
+  --border: #e7e5e4;
+  --input: #e7e5e4;
+  --ring: #0f3460;
+  
+  --radius: 6px;
+}
+
+.dark {
+  /* Warm Dark Scheme */
+  --background: #1c1917;
+  --foreground: #faf9f8;
+  
+  --card: #292524;
+  --card-foreground: #faf9f8;
+  
+  --popover: #292524;
+  --popover-foreground: #faf9f8;
+  
+  --primary: #3b82f6; /* Lighter blue for dark mode */
+  --primary-foreground: #ffffff;
+  
+  --secondary: #44403c;
+  --secondary-foreground: #faf9f8;
+  
+  --muted: #44403c;
+  --muted-foreground: #a8a29e;
+  
+  --accent: #44403c;
+  --accent-foreground: #faf9f8;
+  
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  
+  --border: #44403c;
+  --input: #44403c;
+  --ring: #3b82f6;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  html {
+    @apply font-sans;
+  }
+  h1 {
+    @apply font-heading tracking-tight;
+  }
+  h2, h3, h4, h5, h6 {
+    @apply font-sans tracking-tight;
+  }
+  button, [role="button"], a {
+    @apply cursor-pointer;
+  }
 }
